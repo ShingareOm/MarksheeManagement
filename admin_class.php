@@ -76,7 +76,7 @@ Class Action {
 						$eemail = $v; 
 					}
 					if($k == "user_type_id") {
-						$user_type = $v;
+						$user_type = 1;
 					}
 					if(empty($data)){
 						$data .= " $k='$v' ";
@@ -95,45 +95,51 @@ Class Action {
 			return 2;
 			exit;
 		}
-		// if(isset($_FILES['user_profile_pic']) && $_FILES['user_profile_pic']['tmp_name'] != ''){
-		// 	$fname = strtotime(date('y-m-d H:i')).'_'.$_FILES['user_profile_pic']['name'];
-		// 	$move = move_uploaded_file($_FILES['user_profile_pic']['tmp_name'],'assets/images/'. $fname);
-		// 	$data .= ", user_profile_pic = '$fname' ";
-		// }
 		if(empty($id)){
 			$save = $this->db->query("INSERT INTO users SET $data");
-			$qry =  $this->db->query("SELECT user_id FROM users WHERE user_email = '$eemail'");
-			if ($qry->num_rows > 0) {
-				$row = $qry->fetch_assoc();
-				$user_id = $row['user_id'];
-				if ($user_type == "2" ) {
-					$save = $this->db->query("INSERT INTO students (stud_user_id) VALUES ( $user_id)");
-				}
-			} else {
-				return null;
-			}
 		} else {
 			$save = $this->db->query("UPDATE users SET $data WHERE user_id = $id");
-			$qry = $this->db->query("SELECT * FROM students WHERE user_id = $id");
-			// $qry2 = $this->db->query("SELECT * FROM gpd_hod WHERE user_id = $id");
-			if (!($qry->num_rows > 0)) {
-				if ($user_type == "2" ) {
-					$save = $this->db->query("INSERT INTO gpd_teacher (teacher_id, user_id, department_id) VALUES (NULL, '$user_id', '$department')");
+		}
+		if($save){
+			return $data;
+		} else {
+			return "error";
+		}
+	}
+	function save_stud(){
+		$id = NULL;
+		$enroll = "";
+		$semester = 0;
+		extract($_POST);
+		$data = "";
+		foreach($_POST as $k => $v){
+			if(!in_array($k, array('id','cpass','password')) && !is_numeric($k)){
+				if($k == "student_enroll") {
+					$enroll = $v; 
+				}
+				if($k == "student_id") {
+					$data .= "$k=" . (!empty($v) ? $v : 'NULL'); //
+					continue;
+				}
+				if($k == "student_semester") {
+					$semester = $v; 
+				}
+				if(empty($data)){
+					$data .= " $k='$v' ";
+				} else {
+					$data .= ", $k='$v' ";
 				}
 			}
-			else{
-				if($user_type == 2 )
-					$save = $this->db->query("UPDATE gpd_teacher SET department_id = $department WHERE user_id = $id");
-			}
-			if (!($qry2->num_rows > 0)) {
-				if ($user_type == "3" ) {
-					$save = $this->db->query("INSERT INTO gpd_hod (hod_id, user_id, department_id) VALUES (NULL, '$user_id', '$department')");
-				}
-			}
-			else{
-				if($user_type == 3 )
-				$save = $this->db->query("UPDATE gpd_hod SET department_id = $department WHERE user_id = $id"); 
-			}
+		}
+		$check = $this->db->query("SELECT * FROM students WHERE student_enroll ='$enroll' AND student_semester = ".$semester)->num_rows;
+		if($check > 0){
+			return 2;
+			exit;
+		}
+		if($id == NULL){ // Fixed the comparison operator
+			$save = $this->db->query("INSERT INTO students SET $data");
+		} else {
+			$save = $this->db->query("UPDATE students SET $data WHERE student_id = $id");
 		}
 		if($save){
 			return 1;
@@ -142,7 +148,7 @@ Class Action {
 		}
 	}
 	
-
+	
 
 
 	function apply_mess()

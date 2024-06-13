@@ -15,22 +15,6 @@
 							<label for="" class="control-label">Last Name</label>
 							<input type="text" name="user_surname" class="form-control form-control-sm" required value="<?php echo isset($user_surname) ? $user_surname : '' ?>">
 						</div>
-						<?php if($_SESSION['login_user_type_id'] == 1): ?>
-						<div class="form-group">
-							<label for="" class="control-label">User Role</label>
-							<select  name="user_type_id" id="type" <?php echo (isset($user_type_id) && $user_type_id == 1) ? 'disabled' : '' ?> class="custom-select custom-select-sm" onchange="checkuser(this)">
-								<option value="4" <?php echo isset($user_type_id) && $user_type_id == 4 ? 'selected' : '' ?>>Mess</option>
-								<option value="3" <?php echo isset($user_type_id) && $user_type_id == 3 ? 'selected' : '' ?>>Room Owner</option>
-								<option value="2" <?php echo isset($user_type_id) && $user_type_id == 2 ? 'selected' : '' ?>>Student</option>
-								<option value="1" <?php echo isset($user_type_id) && $user_type_id == 1  ? 'selected readonly="true"' : '' ?>>Administrator</option>
-							</select>
-						</div>
-						
-
-						<?php else: ?>
-							<input type="hidden" name="type" value="3">
-						<?php endif; ?>
-						
 					</div>
 					<div class="col-md-6">
 						
